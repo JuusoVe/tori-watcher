@@ -67,7 +67,7 @@ export const handleSearches = async () => {
     const page = await context.newPage()
 
     const searches = await searchTasks.list()
-    console.log('Searches', searches)
+    console.log('Searches: ', searches.map(({ id }) => id).join(', '))
 
     for (const search of searches) {
         await executeSearch(page, search)
