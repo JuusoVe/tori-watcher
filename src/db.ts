@@ -21,8 +21,12 @@ interface Filter<T> {
     value: unknown
 }
 const credentialFile = './.service-account-credentials.json'
+
+const isCloudRun = process.env.K_SERVICE !== undefined
 const admin = initializeApp({
-    credential: firebaseAdmin.credential.cert(credentialFile),
+    credential: isCloudRun
+        ? applicationDefault()
+        : firebaseAdmin.credential.cert(credentialFile),
     projectId: process.env.FIREBASE_PROJECT_ID,
 })
 
