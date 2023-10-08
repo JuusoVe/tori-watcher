@@ -1,0 +1,64 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  backend_image:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Setup Docker Repository Configuration
+        run: gcloud auth configure-docker eu-west3-docker.pkg.dev
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build --target production -t eu-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest .
+          docker push eu-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest
+
+  backend:
+    runs-on: ubuntu-22.04
+    needs: [backend_image]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: tori-watcher
+
+      - name: Deploy to Cloud Run
+        run: |-
+          gcloud run deploy tori-watcher \
+            --allow-unauthenticated \
+            --region=eu-west3 \
+            --image=eu-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest \
+            --concurrency=40 \
+            --cpu=1 \
+            --min-instances=1 \
+            --max-instances=40 \
+            --memory=512Mi \
+            --platform="managed" \
+            --port=5001 \
+            --quiet

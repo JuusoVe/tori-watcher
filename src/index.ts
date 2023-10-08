@@ -4,10 +4,7 @@ import cors from 'cors'
 import { handleSearches, initializeSearches } from './search'
 
 if (process.env.NODE_ENV !== 'production') {
-    dotenv.config({
-        path: '../.env',
-    })
-    console.log(process.env)
+    dotenv.config()
 }
 
 const app = express()

@@ -1,8 +1,9 @@
 import { Page, chromium } from 'playwright'
 import { SEARCHES, TORI_ITEM_SELECTOR } from './constants'
 import { ToriSearchTask, ToriItem } from './types'
-import { extractPrice, reportNewItems } from './utils'
+import { extractPrice } from './utils'
 import { searchTasks } from './db'
+import { reportNewItems } from './email'
 
 export const executeSearch = async (page: Page, search: ToriSearchTask) => {
     await page.goto(search.searchUrl)
@@ -51,6 +52,11 @@ export const executeSearch = async (page: Page, search: ToriSearchTask) => {
     const newItemsWithPricesBelowMaxPrice = newItemsWithPrices.filter(
         (item) => item.url && item.price && item.price <= search.maxPrice
     ) as ToriItem[]
+
+    if (!newItemsWithPricesBelowMaxPrice.length) {
+        console.log('No new items found for search', search.id)
+        return
+    }
     // Finally report the ones that are low enough price
     await reportNewItems(search, newItemsWithPricesBelowMaxPrice)
 }
