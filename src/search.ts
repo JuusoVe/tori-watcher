@@ -50,14 +50,14 @@ export const executeSearch = async (page: Page, search: ToriSearchTask) => {
     )
 
     const newItemsWithPricesBelowMaxPrice = newItemsWithPrices.filter(
-        (item) => item.url && item.price && item.price <= search.maxPrice
+        (item) => item.url && item.price
     ) as ToriItem[]
 
     if (!newItemsWithPricesBelowMaxPrice.length) {
         console.log('No new items found for search', search.id)
         return
     }
-    // Finally report the ones that are low enough price
+
     await reportNewItems(search, newItemsWithPricesBelowMaxPrice)
 }
 

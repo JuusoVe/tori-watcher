@@ -1,8 +1,6 @@
 export interface ToriSearchTask {
     id: string
-    maxPrice: number
     searchUrl: string
-    reportTo: string[]
     seenItems: string[]
 }
 

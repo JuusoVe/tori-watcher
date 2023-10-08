@@ -1,5 +1,3 @@
-import { ToriSearchTask, ToriItem } from './types'
-
 export const extractPrice = (itemText: string) => {
     const regex = /(\d+)\s*€/
     const match = regex.exec(itemText)
@@ -9,7 +7,6 @@ export const extractPrice = (itemText: string) => {
         return price
     }
 
-    console.error("Couldn't extract price from", itemText)
     return null
 }
 
@@ -33,14 +30,9 @@ const isSendGridError = (error: unknown): error is SendGridError => {
 }
 
 export const logError = (error: unknown) => {
-    if (error instanceof Error) {
-        // If error is an instance of the built-in Error class:
-        console.log(error.message)
-    } else if (isSendGridError(error)) {
-        // If error is a SendGridError:
+    if (isSendGridError(error)) {
         console.log(error.response.body.errors)
     } else {
-        // Otherwise:
         console.error('An unexpected error occurred:', error)
     }
 }
