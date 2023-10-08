@@ -28,7 +28,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build --target production -t eu-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest .
+          docker build -t eu-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest .
           docker push eu-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest
 
   backend:
