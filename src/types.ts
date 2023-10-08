@@ -1,5 +1,5 @@
 export interface ToriSearchTask {
-    searchItemKey: string
+    id: string
     maxPrice: number
     searchUrl: string
     reportTo: string[]

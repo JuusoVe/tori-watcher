@@ -1,16 +1,4 @@
 import {
-    Account,
-    Contact,
-    CrmTemplate,
-    Deal,
-    Meeting,
-    Org,
-    QuotaUse,
-    SysSummary,
-    Transcript,
-    UserData,
-} from '@epicbrief/shared/types/index'
-import {
     CollectionReference,
     DocumentReference,
     FieldValue,
@@ -18,8 +6,10 @@ import {
     UpdateData,
     WhereFilterOp,
 } from 'firebase-admin/firestore'
-import { RecallCalendarConnection } from '@epicbrief/shared/types/UserData'
-import { db as adminDB } from './utils/admin'
+import { applicationDefault, initializeApp } from 'firebase-admin/app'
+import firebaseAdmin from 'firebase-admin'
+import { getFirestore } from 'firebase-admin/firestore'
+import { ToriSearchTask } from './types'
 
 interface WithId {
     id: string
@@ -30,6 +20,13 @@ interface Filter<T> {
     opStr: WhereFilterOp
     value: unknown
 }
+const credentialFile = './.service-account-credentials.json'
+const admin = initializeApp({
+    credential: firebaseAdmin.credential.cert(credentialFile),
+    projectId: process.env.FIREBASE_PROJECT_ID,
+})
+
+const adminDB = getFirestore(admin)
 
 /**
  *
@@ -170,53 +167,10 @@ const createCollectionController = <T extends WithId>(
 export const createClients = (dbToUse?: FirebaseFirestore.Firestore) => {
     const db = dbToUse ?? adminDB
     return {
-        users: createCollectionController<UserData>('users', db),
-        meetings: createCollectionController<Meeting>('meetings', db),
-        transcripts: createCollectionController<Transcript>('transcripts', db),
-        orgs: createCollectionController<Org>('orgs', db),
-        sysSymmaries: createCollectionController<SysSummary>(
-            'sysSummaries',
-            db
-        ),
-        accounts: createCollectionController<Account>('accounts', db),
-        deals: createCollectionController<Deal>('deals', db),
-        contacts: createCollectionController<Contact>('contacts', db),
-        recallCalendars: createCollectionController<RecallCalendarConnection>(
-            'recallCalendars',
-            db
-        ),
-        crmTemplates: createCollectionController<CrmTemplate>(
-            'crmTemplates',
-            db
-        ),
-        quotaUses: createCollectionController<QuotaUse>('quotaUses', db),
+        searchTasks: createCollectionController<ToriSearchTask>('searches', db),
     }
 }
 
-const {
-    users,
-    meetings,
-    transcripts,
-    orgs,
-    sysSymmaries,
-    accounts,
-    deals,
-    contacts,
-    recallCalendars,
-    crmTemplates,
-    quotaUses,
-} = createClients()
+const { searchTasks } = createClients()
 
-export {
-    users,
-    meetings,
-    transcripts,
-    orgs,
-    sysSymmaries,
-    accounts,
-    deals,
-    contacts,
-    recallCalendars,
-    crmTemplates,
-    quotaUses,
-}
+export { searchTasks }

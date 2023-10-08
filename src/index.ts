@@ -1,66 +1,42 @@
-import { Page, chromium } from 'playwright'
-import { ToriItem, ToriSearchTask } from './types'
-import { SEARCHES, TORI_ITEM_SELECTOR } from './constants'
-import { extractPrice, reportNewItems } from './utils'
+import express = require('express')
+import * as dotenv from 'dotenv'
+import cors from 'cors'
+import { handleSearches, initializeSearches } from './search'
 
-const executeSearch = async (page: Page, search: ToriSearchTask) => {
-    await page.goto(search.searchUrl)
-
-    // Wait for the page to load and display the items
-    await page.waitForSelector(TORI_ITEM_SELECTOR)
-
-    const searchResultItemsSelector = page.locator(TORI_ITEM_SELECTOR)
-    const searchResultItems = await searchResultItemsSelector.all()
-
-    const allCurrentItems = await Promise.all(
-        searchResultItems.map(async (item) => {
-            const id = await item.getAttribute('id')
-            return id
-        })
-    )
-
-    const newItemIndexes: number[] = []
-    const newItemIds: string[] = []
-
-    allCurrentItems.forEach((id, index) => {
-        if (id && !search.seenItems.includes(id)) {
-            newItemIndexes.push(index)
-            newItemIds.push(id)
-        }
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config({
+        path: '../.env',
     })
-
-    const newSeensItems = [...search.seenItems, ...newItemIds]
-
-    const newItemsWithPrices = await Promise.all(
-        newItemIndexes.map(async (index) => {
-            const itemText = await searchResultItems[index].innerText()
-            const price = extractPrice(itemText)
-            return {
-                id: newItemIds[index],
-                price: price,
-                url: await searchResultItems[index].getAttribute('href'),
-            }
-        })
-    )
-
-    const newItemsWithPricesBelowMaxPrice = newItemsWithPrices.filter(
-        (item) => item.url && item.price && item.price <= search.maxPrice
-    ) as ToriItem[]
-    await reportNewItems(search, newItemsWithPricesBelowMaxPrice)
+    console.log(process.env)
 }
 
-const main = async () => {
-    const browser = await chromium.launch()
-    const context = await browser.newContext()
-    const page = await context.newPage()
+const app = express()
 
-    for (const search of SEARCHES) {
-        await executeSearch(page, search)
+app.use(cors({ origin: true, credentials: true }))
+app.use(express.json({ limit: '1mb' }))
+
+app.post('/execute-searches', async (_req, res) => {
+    try {
+        console.log('Executing searches')
+        await handleSearches()
+        res.sendStatus(200)
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(500)
     }
+})
 
-    await browser.close()
-}
+app.post('/init-searches', async (_req, res) => {
+    try {
+        console.log('Initializing searches')
+        await initializeSearches()
+        res.sendStatus(200)
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(500)
+    }
+})
 
-;(async () => {
-    await main()
-})()
+app.listen(5001, () => {
+    console.log('Server started on port 5001')
+})
