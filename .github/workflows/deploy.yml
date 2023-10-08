@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - id: "auth"
+      - name: "Setup CLI Auth"        
         uses: "google-github-actions/auth@v1"
         with:
           credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
@@ -38,7 +38,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - id: "auth"
+      - name: "Setup CLI Auth"        
         uses: "google-github-actions/auth@v1"
         with:
           credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
@@ -63,3 +63,19 @@ jobs:
             --port=5001 \
             --quiet \
             --update-secrets=SENDGRID_API_KEY=SENDGRID_API_KEY:latest
+  
+  
+  scheduler:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Setup CLI Auth"        
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: tori-watcher
+
+
