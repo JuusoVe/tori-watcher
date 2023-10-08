@@ -61,4 +61,5 @@ jobs:
             --memory=512Mi \
             --platform="managed" \
             --port=5001 \
-            --quiet
+            --quiet \
+            --update-secrets=SENDGRID_API_KEY=SENDGRID_API_KEY:latest
