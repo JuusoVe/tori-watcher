@@ -28,8 +28,8 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t eu-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest .
-          docker push eu-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest
+          docker build -t europe-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest .
+          docker push europe-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest
 
   backend:
     runs-on: ubuntu-22.04
@@ -53,7 +53,7 @@ jobs:
           gcloud run deploy tori-watcher \
             --allow-unauthenticated \
             --region=eu-west3 \
-            --image=eu-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest \
+            --image=europe-west3-docker.pkg.dev/tori-watcher/tori-watcher/tori-watcher:latest \
             --concurrency=40 \
             --cpu=1 \
             --min-instances=1 \
