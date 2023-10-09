@@ -3,7 +3,8 @@ import { ToriSearchTask, ToriItem } from './types'
 import { logError } from './utils'
 
 const SENDER = 'juuso.vesanto@gmail.com'
-const RECIPIENTS = ['juuso.vesanto@gmail.com', 'supietila@gmail.com']
+const RECIPIENT = 'juuso.vesanto@gmail.com'
+const CC = 'supietila@gmail.com'
 
 export const reportNewItems = async (
     searchTask: ToriSearchTask,
@@ -17,9 +18,11 @@ export const reportNewItems = async (
 
     sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
-    const msg = {
+    const emailMessage = {
         from: SENDER, // Change to your verified sender
         subject: 'New Tori.fi items found for search ' + searchTask.id,
+        to: RECIPIENT,
+        cc: CC,
         text:
             'New Items: ' +
             newItems
@@ -33,18 +36,9 @@ export const reportNewItems = async (
         `,
     }
 
-    const messages = RECIPIENTS.map((recipient) => ({
-        ...msg,
-        to: recipient,
-    }))
-
-    await Promise.all(
-        messages.map((message) => {
-            try {
-                return sgMail.send(message)
-            } catch (error: unknown) {
-                logError(error)
-            }
-        })
-    )
+    try {
+        await sgMail.send(emailMessage)
+    } catch (error: unknown) {
+        logError(error)
+    }
 }
