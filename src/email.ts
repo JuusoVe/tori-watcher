@@ -2,10 +2,6 @@ import sgMail from '@sendgrid/mail'
 import { ToriSearchTask, ToriItem } from './types'
 import { logError } from './utils'
 
-const SENDER = 'juuso.vesanto@gmail.com'
-const RECIPIENT = 'juuso.vesanto@gmail.com'
-const CC = 'supietila@gmail.com'
-
 export const reportNewItems = async (
     searchTask: ToriSearchTask,
     newItems: ToriItem[]
