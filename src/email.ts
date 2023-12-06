@@ -2,6 +2,10 @@ import sgMail from '@sendgrid/mail'
 import { ToriSearchTask, ToriItem } from './types'
 import { logError } from './utils'
 
+const sender = process.env.EMAIL_SENDER
+const recipient = process.env.EMAIL_RECIPIENT
+const cc = process.env.EMAIL_CC
+
 export const reportNewItems = async (
     searchTask: ToriSearchTask,
     newItems: ToriItem[]
@@ -11,14 +15,18 @@ export const reportNewItems = async (
         console.error('No SendGrid API key found')
         return
     }
+    if (!sender || !recipient || !cc) {
+        console.error('Missing email sender, recipient or cc')
+        return
+    }
 
     sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
     const emailMessage = {
-        from: SENDER, // Change to your verified sender
+        from: sender, // Change to your verified sender
         subject: 'New Tori.fi items found for search ' + searchTask.id,
-        to: RECIPIENT,
-        cc: CC,
+        to: recipient,
+        cc: cc,
         text:
             'New Items: ' +
             newItems
