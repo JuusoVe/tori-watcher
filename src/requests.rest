@@ -13,11 +13,3 @@ content-type: application/json
 {}
 
 
-
-###
-
-POST https://tori-watcher-a24kifr6ga-ey.a.run.app/execute-searches HTTP/1.1
-content-type: application/json
-
-{}
-
